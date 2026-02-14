@@ -1,16 +1,23 @@
-# This is a sample Python script.
-
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+max = -1
+row = 0
+col = 0
+
+for i in range(9):
+    col_list = list(map(int, input().split()))
+    for j in range(9):
+        if max <= col_list[j]:
+            max = col_list[j]
+            row = i + 1
+            col = j + 1
+
+print(max)
+print(row, col)
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+
+
+
