@@ -4,7 +4,7 @@
 def insertion_sort(a_list: list[int]) -> list[int]:
     for i in range(1, len(a_list)): # 1 ~ 4
         value = a_list[i]
-        while i > 0 and a_list[i -1] > value:
+        while i > 0 and a_list[i - 1] > value:
             a_list[i] = a_list[i - 1]
             i = i - 1
         a_list[i] = value
