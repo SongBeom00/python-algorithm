@@ -1,4 +1,4 @@
-# Python Basic 노트북 정리 (1~9)
+# Python Basic 노트북 정리 (1~15)
 
 ---
 
@@ -225,10 +225,188 @@ list(dict.fromkeys(x))  # ['a', 1, 'b', 2, 3, 4, 5]
 
 ---
 
+## 11. Dict Items Sum — 딕셔너리 활용
+
+### 값 합산
+
+```python
+d = {'a': 17, 'b': 114, 'c': 247, 'd': 362, 'e': 220, 'f': 728, 'g': -283, 'h': 922}
+
+# 1) for 루프
+total = 0
+for i in d.values():
+    total += i
+
+# 2) sum() (가장 간결)
+sum(d.values())
+
+# 3) 리스트 컴프리헨션
+sum([d[item] for item in d])
+```
+
+### 항목 추가
+
+```python
+d = {'a': 'apple', 'b': 'grape'}
+
+# update()로 여러 항목 추가
+d.update({'c': 'banana', 'd': 'kiwi'})
+
+# 직접 키 접근으로 추가
+d['c'] = 'banana'
+```
+
+### 값 필터링 (value > 25)
+
+```python
+d = {'a': 8, 'b': 33, 'c': 15, 'd': 26, 'e': 12, 'f': 120}
+
+# 1) filter + lambda — x[0]은 key, x[1]은 value
+dict(filter(lambda x: x[1] > 25, d.items()))
+
+# 2) 딕셔너리 컴프리헨션 (가장 Pythonic)
+{k: v for k, v in d.items() if v > 25}
+
+# 3) for 루프
+result = {}
+for k, v in d.items():
+    if v > 25:
+        result[k] = v
+```
+
+### 딕셔너리 순회
+
+```python
+d = dict(one=list(range(1, 11)), two=list(range(11, 23)), three=list(range(23, 37)))
+
+for k, v in d.items():
+    print(f'key "{k}" has values {v} -> total {len(v)}')
+
+# get()으로 접근
+def print_dict_summary(d: dict):
+    for i in d.keys():
+        values = d.get(i)
+        print(f"key '{i}' has values {values} -> total : {len(values)}")
+```
+
+---
+
+## 12. Data Pretty Printer — pprint
+
+- `pprint` : 중첩 구조를 **들여쓰기로 보기 좋게** 출력하는 표준 라이브러리
+- API 응답 등 복잡한 JSON 확인 시 유용
+
+```python
+from urllib import request
+import json
+from pprint import pprint
+
+response = request.urlopen('https://jsonplaceholder.typicode.com/users')
+d = json.loads(response.read())
+
+print(d)    # 한 줄로 출력 (가독성 낮음)
+pprint(d)   # 들여쓰기 적용 (가독성 높음)
+```
+
+---
+
+## 13. Sigma Calculator — 시그마 계산기
+
+1부터 n까지의 합(Σ)을 구하는 **3가지 방법**:
+
+```python
+# 1) 수학 공식 (O(1), 가장 빠름)
+def sigma_n1(n: int) -> int:
+    return (n * (n + 1)) // 2
+
+# 2) for 루프
+def sigma_n2(n: int) -> int:
+    total = 0
+    for i in range(1, n + 1):
+        total += i
+    return total
+
+# 3) sum + range (가장 Pythonic)
+def sigma_n3(n: int) -> int:
+    return sum(range(1, n + 1))
+
+sigma_n1(10)  # 55
+```
+
+| 방법 | 시간복잡도 | 특징 |
+|------|-----------|------|
+| 수학 공식 | O(1) | 가장 빠름 |
+| `for` 루프 | O(n) | 직관적 |
+| `sum(range(...))` | O(n) | 간결하고 Pythonic |
+
+---
+
+## 14. Function Arguments — 함수 인자
+
+- 기본값 있는 매개변수는 반드시 **기본값 없는 매개변수 뒤**에 위치
+- `*args` → 위치 인자를 **튜플(tuple)**로 받음
+- `**kwargs` → 키워드 인자를 **딕셔너리(dict)**로 받음
+
+```python
+# 기본값 인자 (default argument)
+def greet(name: str, msg: str = 'Good morning') -> str:
+    return "Hi! " + name + ', ' + msg
+
+greet("Kim")                    # "Hi! Kim, Good morning"
+greet("Park", "How do you do?") # "Hi! Park, How do you do?"
+
+# *args — 가변 위치 인자
+def add(*args):
+    return sum(args)
+
+add(10, 20, 30)                     # 60
+add(*(i for i in range(1, 101)))    # 5050 (언패킹으로 전달)
+
+# **kwargs — 가변 키워드 인자
+def info(**kwargs):
+    print(kwargs)
+
+info(name='Kim', age=30)   # {'name': 'Kim', 'age': 30}
+info(**{'Kim': 30})        # {'Kim': 30}
+```
+
+---
+
+## 15. Global Variables — 전역 변수
+
+- 함수 내부에서 **전역 변수를 읽기만** 할 때는 그냥 접근 가능
+- 함수 내부에서 **전역 변수에 값을 할당**하면 파이썬이 지역 변수로 판단 → `UnboundLocalError`
+- 전역 변수를 수정하려면 `global` 키워드 선언 필요
+
+```python
+x = 100
+
+# 읽기만 할 경우 — 정상 동작
+def test():
+    return x * 10
+
+print(test())  # 1000
+
+# 할당 시도 — UnboundLocalError 발생
+def test_error():
+    x = x * 10  # 지역 변수로 판단, 초기화 전 참조 에러
+    return x
+
+# global 키워드로 해결
+def test_global():
+    global x
+    x = x * 10
+    return x
+```
+
+---
+
 ## 전체 흐름 요약
 
 ```
-변수 규칙 -> 비교 연산 -> 타입 에러 -> 인덱싱 -> 슬라이싱 -> 아이템 선택 -> range 기초 -> range 심화 -> map/lambda 종합 -> 중복 제거
+변수 규칙 → 비교 연산 → 타입 에러 → 인덱싱 → 슬라이싱 → 아이템 선택
+→ range 기초 → range 심화 → map/lambda 종합 → 중복 제거
+→ 딕셔너리 활용 → pprint → 시그마 계산기 → 함수 인자 → 전역 변수
 ```
 
-기초 문법에서 시작해 시퀀스 자료형 조작, 리스트 컴프리헨션, 람다/map, 집합 자료형 등 점진적으로 심화되는 구성입니다.
+기초 문법에서 시작해 시퀀스 자료형 조작, 리스트 컴프리헨션, 람다/map, 딕셔너리, 함수 심화(가변 인자, 전역 변수)까지 점진적으로 심화되는 구성입니다.
