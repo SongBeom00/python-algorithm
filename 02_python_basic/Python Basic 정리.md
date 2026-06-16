@@ -1,4 +1,4 @@
-# Python Basic 노트북 정리 (1~15)
+# Python Basic 노트북 정리 (1~18)
 
 ---
 
@@ -401,12 +401,123 @@ def test_global():
 
 ---
 
+## 16. Local Variables — 지역 변수
+
+- 함수 내부에서 선언한 변수는 **지역 변수(local variable)** → 함수 밖에서 접근 불가
+- 같은 이름의 전역 변수가 있어도, 함수 내에서 새로 할당하면 **별개의 지역 변수**로 동작
+- `global` 선언 시 함수 내부에서 **전역 변수를 직접 수정** 가능
+
+```python
+a = 20
+
+def test():
+    a = 35      # 지역 변수 (전역 a와 별개)
+    return a
+
+print(a)        # 20 (전역)
+print(test())   # 35 (지역)
+print(a)        # 20 (전역 그대로)
+```
+
+```python
+a = 20
+
+def test():
+    global a
+    a = 35      # 전역 변수 수정
+    return a
+
+print(a)        # 20
+a = 100
+print(a)        # 100
+print(test())   # 35
+print(a)        # 35 (전역이 바뀜)
+```
+
+| 변수 유형 | 범위 | 특징 |
+|-----------|------|------|
+| 지역 변수 | 함수 내부 | 함수 종료 시 소멸 |
+| 전역 변수 | 모듈 전체 | `global` 없이는 함수 내에서 수정 불가 |
+
+---
+
+## 17. String Split By Delimiter — 구분자로 문자열 분리
+
+- `str.split()` : 공백 기준으로 분리, 리스트 반환
+- `str.split(sep, maxsplit)` : 구분자와 분리 횟수 지정
+- 파일에서 텍스트를 읽어 단어 수를 세는 실용 예제
+
+```python
+in_str = 'Suppose we have few words that are separated by spaces.'
+
+a = in_str.split()       # 공백 기준 분리
+print(len(a))            # 10
+
+b = in_str.split('&', 2) # '&' 기준, 최대 2번만 분리
+# ['orange', 'banana', 'apple&kiwi&watermelon']
+```
+
+```python
+import re
+
+def cnt_word(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        txt = file.read()
+
+    # 방법 1: replace로 쉼표 제거 후 split
+    txt_list = txt.replace(',', ' ').split()
+
+    # 방법 2: 정규표현식으로 공백 또는 쉼표 기준 분리
+    txt_list = re.split(' |,', txt)
+
+    return len(txt_list)
+```
+
+| 방법 | 특징 |
+|------|------|
+| `split()` | 공백(스페이스·탭·개행) 기준, maxsplit 지정 가능 |
+| `replace + split` | 특정 문자를 공백으로 치환 후 분리 |
+| `re.split` | 복수 구분자를 정규식으로 처리 |
+
+---
+
+## 18. Alphabet in a File — 파일에 알파벳 쓰기
+
+- `string.ascii_uppercase` : A~Z 대문자 알파벳 문자열
+- `' '.join(iterable)` : 반복 가능 객체를 구분자로 연결
+- 파일 쓰기(`'w'` 모드)와 `with open` 블록 활용
+
+```python
+import string
+
+def file_write(file_path):
+    with open(file_path, 'w', encoding='utf-8') as file:
+        # 방법 1: for 루프
+        for letter in string.ascii_uppercase:
+            file.write(letter + ' ')
+
+        # 방법 2: join (더 간결)
+        file.write(' '.join(string.ascii_uppercase))
+        # 결과: "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+
+file_write('./source/23-1.txt')
+```
+
+| 요소 | 설명 |
+|------|------|
+| `string.ascii_uppercase` | `'ABCDEFGHIJKLMNOPQRSTUVWXYZ'` |
+| `' '.join(...)` | 이터러블을 공백으로 연결 |
+| `open(..., 'w')` | 파일 새로 쓰기 (없으면 생성, 있으면 덮어쓰기) |
+
+---
+
 ## 전체 흐름 요약
 
 ```
 변수 규칙 → 비교 연산 → 타입 에러 → 인덱싱 → 슬라이싱 → 아이템 선택
 → range 기초 → range 심화 → map/lambda 종합 → 중복 제거
 → 딕셔너리 활용 → pprint → 시그마 계산기 → 함수 인자 → 전역 변수
+→ 지역 변수 → 문자열 분리 → 파일 쓰기
 ```
 
-기초 문법에서 시작해 시퀀스 자료형 조작, 리스트 컴프리헨션, 람다/map, 딕셔너리, 함수 심화(가변 인자, 전역 변수)까지 점진적으로 심화되는 구성입니다.
+기초 문법에서 시작해 시퀀스 자료형 조작, 리스트 컴프리헨션, 람다/map, 딕셔너리, 함수 심화(가변 인자, 전역·지역 변수), 문자열 처리, 파일 I/O까지 점진적으로 심화되는 구성입니다.
